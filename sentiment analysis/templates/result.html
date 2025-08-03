@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sentiment Result</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 700px;
+      margin: auto;
+      padding: 20px;
+      background: #fefefe;
+    }
+    .review-box {
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+    }
+    canvas {
+      max-width: 300px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  {% if error %}
+    <h3 style="color: red;">{{ error }}</h3>
+  {% else %}
+    <h2>Sentiment for: <em>{{ product_name }}</em></h2>
+
+    <h3>Individual Review Sentiments:</h3>
+    {% for r in reviews %}
+      <div class="review-box">
+        <strong>Review:</strong> {{ r.review }}<br>
+        <strong>Sentiment:</strong> {{ r.sentiment }} {{ r.emoji }}
+      </div>
+    {% endfor %}
+
+    <h3>Overall Summary:</h3>
+    <p>Positive: {{ percentages.positive }}% 😃</p>
+    <p>Negative: {{ percentages.negative }}% 😞</p>
+    <p>Neutral: {{ percentages.neutral }}% 😐</p>
+
+    <canvas id="pieChart"></canvas>
+
+    <script>
+      const ctx = document.getElementById('pieChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['Positive', 'Negative', 'Neutral'],
+          datasets: [{
+            data: [{{ sentiments.POSITIVE }}, {{ sentiments.NEGATIVE }}, {{ sentiments.NEUTRAL }}],
+            backgroundColor: ['#4CAF50', '#F44336', '#FFC107']
+          }]
+        },
+        options: {
+          responsive: false,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      });
+    </script>
+  {% endif %}
+
+  <br><br>
+  <a href="/">🔙 Analyze Another Product</a>
+</body>
+</html>
